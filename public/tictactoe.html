@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <link href="/src/css/output.css" rel="stylesheet">
+  </head>
+  <body class="bg-gradient-to-r from-zinc-600 to-zinc-800">
+    <nav class="bg-green-600 p-6">
+      <ul class="text-white text-lg">
+        <li class="font-bold text-xl text-zinc-600 hover:text-zinc-400 transition-transform duration-300 ease-in-out transform hover:scale-y-110">MyTicTacToe.Com</li>
+      </ul>
+    </nav>
+    <div class="gameInfo text-center mt-4">
+      <h1 class="text-2xl font-bold mb-2">Welcome to MyTicTacToe Game</h1>
+      <div class="flex justify-center items-center space-x-4">
+        <span class="info text-lg">Turn for X</span>
+    <div class="gameContainer flex flex-col items-center mt-8">
+        <div class="container grid grid-cols-3 gap-2 border-4 border-gray-300 p-4">
+          <div class="line col-span-3 border-b-2 border-gray-400 mb-2"></div>
+        <div class="box bt-0 bl-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box bt-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box bt-0 br-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box bl-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box br-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box bl-0 bb-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box bb-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box bb-0 br-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+      </div>
+
+          <button id="reset" class="bg-amber-400 text-stone-500 text-lg px-4 py-2 rounded">Reset</button>
+        </div>
+        <div class="imgbox mt-4  ">
+          <img src="../excited.gif" alt="" class="w-32 h-32 mx-auto" />
+        </div>
+      </div>
+    </div>
+    <script src="/src/javascript/scrept.js"></script>
+  </body>
+</html>
