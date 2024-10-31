@@ -5,39 +5,94 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tic Tac Toe</title>
-    <link href="/src/css/output.css" rel="stylesheet">
+    <link href="./css/output.css" rel="stylesheet">
+    <style>
+        .spin-btn {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hole-container {
+            display: none;
+        }
+    </style>
   </head>
-  <body class="bg-gradient-to-r from-zinc-600 to-zinc-800">
-    <nav class="bg-green-600 p-6">
-      <ul class="text-white text-lg">
-        <li class="font-bold text-xl text-zinc-600 hover:text-zinc-400 transition-transform duration-300 ease-in-out transform hover:scale-y-110">MyTicTacToe.Com</li>
-      </ul>
-    </nav>
+  <body class="bg-gradient-to-r from-zinc-600 to-zinc-800 min-h-screen flex flex-col items-center justify-center">
+        <div style="font-size: 4rem; font-weight: 800; text-align: center; color: #fbbf24; margin-bottom: 2rem; font-family: 'Comic Sans MS', cursive; animation: bounce 1s infinite; margin-top: 2.5rem; padding-bottom: 2.5rem;">
+      My TicTacToe Game
+    </div>
+    <div class="hole-container " style="display: none;">
+
     <div class="gameInfo text-center mt-4">
       <h1 class="text-2xl font-bold mb-2">Welcome to MyTicTacToe Game</h1>
-      <div class="flex justify-center items-center space-x-4">
-        <span class="info text-lg">Turn for X</span>
+      <div class="flex justify-between w-full max-w-2xl mb-8">
+        <div class="player-container bg-zinc-700 p-4 rounded-lg shadow-lg w-64">
+          <h2 class="text-amber-400 text-xl font-bold mb-2"> </h2>
+          <div id="player-name" class="text-white text-lg"></div>
+          <div id="player-symbol" class="text-amber-400 text-2xl mt-1 font-bold"></div>
+        </div>
+        
+        <div class="opponent-container bg-zinc-700 p-4 rounded-lg shadow-lg w-64">
+          <h2 class="text-amber-400 text-xl font-bold mb-2"></h2>
+          <div id="opponent-name" class="text-white text-lg"></div>
+          <div id="opponent-symbol" class="text-amber-400 text-2xl mt-1 font-bold"></div>
+        </div>
+      </div>
+      <div class="flex justify-center items-center">
+        <div class="info-container bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 p-4 rounded-lg shadow-xl border-2 border-gray-600 backdrop-blur-sm">  
+          <span class="info1 text-lg px-4 py-2 rounded-md bg-amber-400 bg-opacity-100 shadow-lg transform -translate-x-20 transition-all duration-300 hover:scale-110">Turn for X</span>
+          <span class="info2 text-lg px-4 py-2 rounded-md bg-zinc-600 bg-opacity-100 shadow-lg transform translate-x-20 transition-all duration-300 hover:scale-110">Turn for O</span>
+        </div>
     <div class="gameContainer flex flex-col items-center mt-8">
         <div class="container grid grid-cols-3 gap-2 border-4 border-gray-300 p-4">
-          <div class="line col-span-3 border-b-2 border-gray-400 mb-2"></div>
-        <div class="box bt-0 bl-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
-        <div class="box bt-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
-        <div class="box bt-0 br-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
-        <div class="box bl-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
-        <div class="box border border-gray-300 p-4"><span class="boxtext"></span></div>
-        <div class="box br-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
-        <div class="box bl-0 bb-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
-        <div class="box bb-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
-        <div class="box bb-0 br-0 border border-gray-300 p-4"><span class="boxtext"></span></div>
+        <div class="box bt-0 bl-0 border border-gray-300 p-4 w-5 h-5"><span class="boxtext w-5 h-5"></span></div>
+        <div class="box bt-0 border border-gray-300 p-4 w-5 h-5"><span class="boxtext w-5 h-5"></span></div>
+        <div class="box bt-0 br-0 border border-gray-300 p-4"><span class="boxtext w-5 h-5"></span></div>
+        <div class="box bl-0 border border-gray-300 p-4 w-5 h-5"><span class="boxtext w-5 h-5"></span></div>
+        <div class="box border border-gray-300 p-4 w-5 h-5"><span class="boxtext w-5 h-5"></span></div>
+        <div class="box br-0 border border-gray-300 p-4 w-5 h-10"><span class="boxtext w-5 h-10"></span></div>
+        <div class="box bl-0 bb-0 border border-gray-300 p-4 w-5 h-10 "><span class="boxtext w-5 h-10"></span></div>
+        <div class="box bb-0 border border-gray-300 p-4 w-5 h-10"><span class="boxtext w-5 h-10"></span></div>
+        <div class="box bb-0 br-0 border border-gray-300 p-4 w-5 h-10"><span class="boxtext w-5 h-10"></span></div>
       </div>
 
           <button id="reset" class="bg-amber-400 text-stone-500 text-lg px-4 py-2 rounded">Reset</button>
         </div>
-        <div class="imgbox mt-4  ">
-          <img src="../excited.gif" alt="" class="w-32 h-32 mx-auto" />
+        <div class="imgbox mt-4" style="display: none;">
+          <img src="./excited.gif" alt="" class="w-32 h-32 mx-auto" />
         </div>
       </div>
     </div>
-    <script src="/src/javascript/scrept.js"></script>
+    <script src="./javascript/scrept.js" type="module"></script>
+    <script src="./socket.io/socket.io.js"></script>
+    <script type="module">
+      import { createUserEntryModal } from "./javascript/userentry.js";
+      const socket = io();
+   
+      const playerName = localStorage.getItem('playerName');
+      createUserEntryModal(socket);
+    </script>
+    <button id="findOpponentBtn" class="spin-btn">Finding Opponent...</button>
+    <div id="holeContainer" class="hole-container">
+        <!-- Content for when opponent is found -->
+        Opponent Found!
+    </div>
+    <script>
+        function opponentFound() {
+            // Stop the spinning animation
+            document.getElementById('findOpponentBtn').classList.remove('spin-btn');
+            document.getElementById('findOpponentBtn').textContent = 'Opponent Found';
+
+            // Display the hole-container
+            document.getElementById('holeContainer').style.display = 'block';
+        }
+
+        // Simulate finding an opponent after 3 seconds
+        setTimeout(opponentFound, 3000);
+    </script>
   </body>
 </html>
