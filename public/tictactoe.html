@@ -22,20 +22,21 @@
     </style>
   </head>
   <body class="bg-gradient-to-r from-zinc-600 to-zinc-800 min-h-screen flex flex-col items-center justify-center">
-        <div style="font-size: 4rem; font-weight: 800; text-align: center; color: #fbbf24; margin-bottom: 2rem; font-family: 'Comic Sans MS', cursive; animation: bounce 1s infinite; margin-top: 2.5rem; padding-bottom: 2.5rem;">
+   
+    <div style="font-size: 4rem; font-weight: 800; text-align: center; color: #fbbf24; margin-bottom: 2rem; font-family: 'Comic Sans MS', cursive; animation: bounce 1s infinite; margin-top: 2.5rem; padding-bottom: 2.5rem;">
       My TicTacToe Game
     </div>
-    <div class="hole-container " style="display: none;">
-
+    <div class="hole-container hidden">
+      <!-- Ensure this container is displayed when needed -->
+    </div>
     <div class="gameInfo text-center mt-4">
       <h1 class="text-2xl font-bold mb-2">Welcome to MyTicTacToe Game</h1>
       <div class="flex justify-between w-full max-w-2xl mb-8">
         <div class="player-container bg-zinc-700 p-4 rounded-lg shadow-lg w-64">
-          <h2 class="text-amber-400 text-xl font-bold mb-2"> </h2>
+          <h2 class="text-amber-400 text-xl font-bold mb-2"></h2>
           <div id="player-name" class="text-white text-lg"></div>
           <div id="player-symbol" class="text-amber-400 text-2xl mt-1 font-bold"></div>
         </div>
-        
         <div class="opponent-container bg-zinc-700 p-4 rounded-lg shadow-lg w-64">
           <h2 class="text-amber-400 text-xl font-bold mb-2"></h2>
           <div id="opponent-name" class="text-white text-lg"></div>
@@ -47,24 +48,32 @@
           <span class="info1 text-lg px-4 py-2 rounded-md bg-amber-400 bg-opacity-100 shadow-lg transform -translate-x-20 transition-all duration-300 hover:scale-110">Turn for X</span>
           <span class="info2 text-lg px-4 py-2 rounded-md bg-zinc-600 bg-opacity-100 shadow-lg transform translate-x-20 transition-all duration-300 hover:scale-110">Turn for O</span>
         </div>
-    <div class="gameContainer flex flex-col items-center mt-8">
-        <div class="container grid grid-cols-3 gap-2 border-4 border-gray-300 p-4">
-        <div class="box bt-0 bl-0 border border-gray-300 p-4 w-5 h-5"><span class="boxtext w-5 h-5"></span></div>
-        <div class="box bt-0 border border-gray-300 p-4 w-5 h-5"><span class="boxtext w-5 h-5"></span></div>
-        <div class="box bt-0 br-0 border border-gray-300 p-4"><span class="boxtext w-5 h-5"></span></div>
-        <div class="box bl-0 border border-gray-300 p-4 w-5 h-5"><span class="boxtext w-5 h-5"></span></div>
-        <div class="box border border-gray-300 p-4 w-5 h-5"><span class="boxtext w-5 h-5"></span></div>
-        <div class="box br-0 border border-gray-300 p-4 w-5 h-10"><span class="boxtext w-5 h-10"></span></div>
-        <div class="box bl-0 bb-0 border border-gray-300 p-4 w-5 h-10 "><span class="boxtext w-5 h-10"></span></div>
-        <div class="box bb-0 border border-gray-300 p-4 w-5 h-10"><span class="boxtext w-5 h-10"></span></div>
-        <div class="box bb-0 br-0 border border-gray-300 p-4 w-5 h-10"><span class="boxtext w-5 h-10"></span></div>
+        <div class="gameContainer flex flex-col items-center mt-8">
+          <div class="container grid grid-cols-3 gap-4 border-4 border-amber-400 p-6 rounded-lg bg-zinc-800 shadow-2xl">
+         
+            <div id="box1" class="box bt-0 bl-0 border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+            <div id="box2" class="box bt-0 border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+            <div id="box3" class="box bt-0 br-0 border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+            <div id="box4" class="box bl-0 border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+            <div id="box5" class="box border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+            <div id="box6" class="box br-0 border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+            <div id="box7" class="box bl-0 bb-0 border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+            <div id="box8" class="box bb-0 border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+            <div id="box9" class="box bb-0 br-0 border-2 border-amber-400 p-8 w-24 h-24 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer shadow-lg hover:shadow-amber-400/50"><span class="boxtext w-full h-full flex items-center justify-center text-4xl text-amber-400 font-bold"></span></div>
+          </div>
+        </div>
+        <button id="reset" class="bg-amber-400 text-stone-500 text-lg px-4 py-2 rounded">Reset</button>
       </div>
-
-          <button id="reset" class="bg-amber-400 text-stone-500 text-lg px-4 py-2 rounded">Reset</button>
-        </div>
-        <div class="imgbox mt-4" style="display: none;">
-          <img src="./excited.gif" alt="" class="w-32 h-32 mx-auto" />
-        </div>
+      <div class="winnerbox mt-4 hidden">
+        <img src="./excited.gif" alt="" class="w-32 h-32 mx-auto" />
+      </div>
+      <div class="looserbox mt-4 hidden">
+        you loose <strong>play again</strong>
+      </div> 
+    </div>
+    <div id="findOpponent" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center" style="display: none;">
+      <div class="text-6xl font-['Gameye'] text-amber-400 animate-pulse">
+        Searching for Opponent...
       </div>
     </div>
     <script src="./javascript/scrept.js" type="module"></script>
@@ -72,27 +81,7 @@
     <script type="module">
       import { createUserEntryModal } from "./javascript/userentry.js";
       const socket = io();
-   
-      const playerName = localStorage.getItem('playerName');
-      createUserEntryModal(socket);
-    </script>
-    <button id="findOpponentBtn" class="spin-btn">Finding Opponent...</button>
-    <div id="holeContainer" class="hole-container">
-        <!-- Content for when opponent is found -->
-        Opponent Found!
-    </div>
-    <script>
-        function opponentFound() {
-            // Stop the spinning animation
-            document.getElementById('findOpponentBtn').classList.remove('spin-btn');
-            document.getElementById('findOpponentBtn').textContent = 'Opponent Found';
-
-            // Display the hole-container
-            document.getElementById('holeContainer').style.display = 'block';
-        }
-
-        // Simulate finding an opponent after 3 seconds
-        setTimeout(opponentFound, 3000);
+      createUserEntryModal(socket,document.querySelector('.hole-container'));
     </script>
   </body>
 </html>

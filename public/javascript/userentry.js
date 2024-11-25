@@ -1,5 +1,8 @@
-// Create modal elements
-export function createUserEntryModal(socket) {
+// Create User Entry Modal
+export function createUserEntryModal(socket, gameContainer) {
+  let playerName;
+
+  // Create Modal Elements
   const modal = document.createElement('div');
   modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center mt-10';
 
@@ -17,44 +20,31 @@ export function createUserEntryModal(socket) {
 
   const button = document.createElement('button');
   button.className = 'bg-amber-400 text-white px-4 py-2 rounded-md hover:bg-amber-500 transition-colors';
-  button.textContent = 'search for a player';
+  button.textContent = 'Search for a Player';
 
-  // Add elements to DOM
+  // Append Elements
   modalContent.appendChild(heading);
   modalContent.appendChild(input);
   modalContent.appendChild(button);
   modal.appendChild(modalContent);
   document.body.appendChild(modal);
 
+  // Check for existing playerName in localStorage
+  const storedPlayerName = localStorage.getItem('playerName');
+  if (storedPlayerName) {
+    playerName = storedPlayerName;
+    console.log('Reconnecting as:', playerName);
+    modal.remove();
+    startPlayerSession(playerName);
+  }
 
-  // Handle button click
+  // Handle Button Click
   button.addEventListener('click', () => {
-    const playerName = input.value.trim();
+    playerName = input.value.trim();
     if (playerName) {
-      modal.remove();
-      // Store player name
-      
-   
       localStorage.setItem('playerName', playerName);
-      socket.emit('playerJoined', {name:playerName});
-      socket.on('startGame',(e)=>{
-        let allPlayers = e.allPlayers;
-        console.log(allPlayers);
-
-        let findObject = allPlayers.find(player=>player.player1.name === playerName || player.player2.name === playerName);
-            let opponent  ;
-            let Value;
-      
-            findObject.player1.name === playerName ? opponent = findObject.player2.name : opponent = findObject.player1.name;
-        
-            findObject.player1.name === playerName ? Value = findObject.player1.pvalue : Value = findObject.player2.pvalue;
-
-        console.log(opponent);
-        document.querySelector('.player-name').textContent = playerName;
-        document.querySelector('.opponent-name').textContent = opponent;
-        document.querySelector('.hole-container').style.display = 'block';
-        
-      })
+      modal.remove();
+      startPlayerSession(playerName);
     } else {
       input.classList.add('border-red-500');
       input.placeholder = 'Name is required';
@@ -62,10 +52,118 @@ export function createUserEntryModal(socket) {
     }
   });
 
-  // Prevent closing modal by clicking outside
+  // Prevent Modal Closure on Click Outside
   modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      e.stopPropagation();
+    if (e.target === modal) e.stopPropagation();
+  });
+
+  // Start Player Session
+  function startPlayerSession(playerName) {
+    console.log('Player name set to:', playerName);
+    socket.emit('playerJoined', { name: playerName });
+
+    // Show Find Opponent Button
+    const findOpponentButton = document.getElementById('findOpponent');
+    findOpponentButton.style.display = 'block';
+
+    // Handle Game Start
+    socket.on('startGame', (e) => {
+      console.log('Game started:', e);
+      findOpponentButton.style.display = 'none';
+
+      const allPlayers = e.allPlayers;
+      const game = allPlayers.find(player =>
+        player.player1.name === playerName || player.player2.name === playerName
+      );
+
+      if (game) {
+        console.log ("game started :",game);
+        const opponent = game.player1.name === playerName ? game.player2.name : game.player1.name;
+        const playerSymbol = game.player1.name === playerName ? game.player1.pvalue : game.player2.pvalue;
+
+        // Update Player and Opponent Info
+        document.querySelector('#player-name').textContent = playerName;
+        document.querySelector('#player-symbol').textContent = playerSymbol.toUpperCase();
+        document.querySelector('#opponent-name').textContent = opponent;
+        document.querySelector('#opponent-symbol').textContent = playerSymbol === 'X' ? 'O' : 'X';
+        
+        // Show Game Container
+        document.querySelector('.hole-container').style.display = 'block';
+
+        // Update Game Info Styling
+        updateGameInfoStyling(playerSymbol);
+      }
+
+
+// Handle Box Clicks
+document.querySelectorAll('.box').forEach(box => {
+  
+  box.addEventListener('click', () => {
+    let  move=game.player1.name===playerName?game.player1.p1Move:game.player2.p2Move;
+    const boxText = box.querySelector('.boxtext').textContent;
+    const boxId = box.id;
+
+    if (boxText === '') { // Prevent overwriting moves
+      const playerSymbol = document.querySelector('#player-symbol').textContent; // Get player's symbol
+      box.querySelector('.boxtext').textContent = playerSymbol; // Local Update (Visual Feedback)
+      move=move===true?false:true;
+      console.log("from boxclick ",move);
+      localStorage.setItem("move",JSON.stringify(move));
+      // Emit event to server
+      socket.emit('boxClicked', { id: boxId, value: playerSymbol,nxtMove: move });
     }
   });
+});
+
+
+// Listen for updates from the server
+socket.on('updateBoard', (data) => {
+  console.log("this is from updateboard in frontend",data);
+  const box = document.getElementById(data.id);
+  if (box && box.querySelector('.boxtext').textContent === '') { // Update only if box is empty
+    box.querySelector('.boxtext').textContent = data.value;
+  let localmove = JSON.parse(localStorage.getItem("move"));
+if (localmove === null) {
+  localmove = true;
+}
+localStorage.setItem("move", JSON.stringify(!localmove));
+    console.log(localmove);
+    if (localmove === true) {
+      // Enable all boxes for the next move
+      document.querySelectorAll('.box').forEach(box => {
+        box.classList.remove('opacity-50', 'cursor-not-allowed'); // Remove disabled classes
+        box.disabled = false; // Enable the box
+        console.log("boxes enabled")
+      });
+    } else {
+      // Disable all boxes for the next move
+      document.querySelectorAll('.box').forEach(box => {
+        box.classList.add('opacity-50', 'cursor-not-allowed'); // Add disabled classes
+        box.disabled = true; // Disable the box
+        console.log("boxes desabled")
+      });
+    }
+ 
+  }
+});
+});
+  
+  }
+
+  // Helper: Update Game Info Styling
+  function updateGameInfoStyling(playerSymbol) {
+    const info1 = document.querySelector('.info1');
+    const info2 = document.querySelector('.info2');
+    if (playerSymbol === 'X') {
+      info1.classList.add('bg-amber-400');
+      info1.classList.remove('bg-zinc-600');
+      info2.classList.add('bg-zinc-100');
+      info2.classList.remove('bg-amber-200');
+    } else {
+      info2.classList.add('bg-amber-100');
+      info2.classList.remove('bg-zinc-200');
+      info1.classList.add('bg-zinc-600');
+      info1.classList.remove('bg-amber-400');
+    }
+  }
 }
