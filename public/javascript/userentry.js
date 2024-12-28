@@ -1,5 +1,5 @@
 // Create User Entry Modal
-export function createUserEntryModal(socket, gameContainer) {
+export function createUserEntryModal(socket,Checkfunction) {
   let playerName;
 
   // Create Modal Elements
@@ -59,7 +59,6 @@ export function createUserEntryModal(socket, gameContainer) {
 
   // Start Player Session
   function startPlayerSession(playerName) {
-    console.log('Player name set to:', playerName);
     socket.emit('playerJoined', { name: playerName });
 
     // Show Find Opponent Button
@@ -87,65 +86,68 @@ export function createUserEntryModal(socket, gameContainer) {
         document.querySelector('#opponent-name').textContent = opponent;
         document.querySelector('#opponent-symbol').textContent = playerSymbol === 'X' ? 'O' : 'X';
         
-        // Show Game Container
-        document.querySelector('.hole-container').style.display = 'block';
 
         // Update Game Info Styling
-        updateGameInfoStyling(playerSymbol);
+      
       }
 
-
+      const playerSymbol = document.querySelector('#player-symbol').textContent;
 // Handle Box Clicks
 document.querySelectorAll('.box').forEach(box => {
-  
   box.addEventListener('click', () => {
     let  move=game.player1.name===playerName?game.player1.p1Move:game.player2.p2Move;
     const boxText = box.querySelector('.boxtext').textContent;
     const boxId = box.id;
 
     if (boxText === '') { // Prevent overwriting moves
-      const playerSymbol = document.querySelector('#player-symbol').textContent; // Get player's symbol
+      // Get player's symbol
       box.querySelector('.boxtext').textContent = playerSymbol; // Local Update (Visual Feedback)
       move=move===true?false:true;
-      console.log("from boxclick ",move);
-      localStorage.setItem("move",JSON.stringify(move));
+ 
       // Emit event to server
       socket.emit('boxClicked', { id: boxId, value: playerSymbol,nxtMove: move });
+    
     }
+  
   });
 });
-
+updateBoard(  )
 
 // Listen for updates from the server
-socket.on('updateBoard', (data) => {
-  console.log("this is from updateboard in frontend",data);
-  const box = document.getElementById(data.id);
-  if (box && box.querySelector('.boxtext').textContent === '') { // Update only if box is empty
-    box.querySelector('.boxtext').textContent = data.value;
-  let localmove = JSON.parse(localStorage.getItem("move"));
-if (localmove === null) {
-  localmove = true;
-}
-localStorage.setItem("move", JSON.stringify(!localmove));
-    console.log(localmove);
-    if (localmove === true) {
-      // Enable all boxes for the next move
-      document.querySelectorAll('.box').forEach(box => {
-        box.classList.remove('opacity-50', 'cursor-not-allowed'); // Remove disabled classes
-        box.disabled = false; // Enable the box
-        console.log("boxes enabled")
-      });
-    } else {
-      // Disable all boxes for the next move
-      document.querySelectorAll('.box').forEach(box => {
-        box.classList.add('opacity-50', 'cursor-not-allowed'); // Add disabled classes
-        box.disabled = true; // Disable the box
-        console.log("boxes desabled")
-      });
+function updateBoard(   ){
+  socket.on('updateBoard', (data) => {
+    console.log("this is from updateboard in frontend",data);
+    const box = document.getElementById(data.id);
+    if (box && box.querySelector('.boxtext').textContent === '') { // Update only if box is empty
+      box.querySelector('.boxtext').textContent = data.value;
+      if (data.nxtMove === true) {
+        console.log(data.value);
+        // Enable all boxes for the next move
+        document.querySelectorAll('.box').forEach(box => {
+          box.classList.remove('opacity-50', 'cursor-not-allowed'); // Remove disabled classes
+          box.disabled = false; // Enable the box
+          console.log("boxes enabled")
+        });
+      } else {
+        // Disable all boxes for the next move
+        document.querySelectorAll('.box').forEach(box => {
+          box.classList.add('opacity-50', 'cursor-not-allowed'); // Add disabled classes
+          box.disabled = true; // Disable the box
+          console.log("boxes desabled")
+        });
+      }
     }
- 
-  }
-});
+    updateGameInfoStyling(playerSymbol);
+    let boxes=document.querySelectorAll(".box");
+    if(Checkfunction(boxes)){
+  
+      alert("Game Over");
+    }else{
+      console.log(boxes)
+    }
+  });
+}
+
 });
   
   }
@@ -155,15 +157,15 @@ localStorage.setItem("move", JSON.stringify(!localmove));
     const info1 = document.querySelector('.info1');
     const info2 = document.querySelector('.info2');
     if (playerSymbol === 'X') {
-      info1.classList.add('bg-amber-400');
       info1.classList.remove('bg-zinc-600');
-      info2.classList.add('bg-zinc-100');
+      info1.classList.add('bg-amber-400');
       info2.classList.remove('bg-amber-200');
+      info2.classList.add('bg-zinc-100');
     } else {
-      info2.classList.add('bg-amber-100');
-      info2.classList.remove('bg-zinc-200');
-      info1.classList.add('bg-zinc-600');
-      info1.classList.remove('bg-amber-400');
+      info1.classList.remove('bg-zinc-400');
+      info1.classList.add('bg-amber-600');
+      info2.classList.remove('bg-amber-100');
+      info2.classList.add('bg-zinc-200');
     }
   }
 }
