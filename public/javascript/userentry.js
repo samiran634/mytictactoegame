@@ -136,10 +136,12 @@ export function createUserEntryModal(socket,Checkfunction) {
               });
             }
           }
-          updateGameInfoStyling(playerSymbol);
+          updateGameInfoStyling(data.value);
           let boxes=document.querySelectorAll(".box");
+          let state="looser";
           if(Checkfunction(boxes)){
             socket.emit('gameOver',playerName);
+            state = "winner";
             alert("Game Over");
           }else{
             console.log(boxes)
@@ -164,13 +166,13 @@ export function createUserEntryModal(socket,Checkfunction) {
         if (playerSymbol === 'X') {
           info1.classList.remove('bg-zinc-600');
           info1.classList.add('bg-amber-400');
+          info2.classList.remove('bg-zinc-100');
+          info2.classList.add('bg-amber-200');
+        } else {
+          info1.classList.remove('bg-amber-400');
+          info1.classList.add('bg-zinc-600');
           info2.classList.remove('bg-amber-200');
           info2.classList.add('bg-zinc-100');
-        } else {
-          info1.classList.remove('bg-zinc-400');
-          info1.classList.add('bg-amber-600');
-          info2.classList.remove('bg-amber-100');
-          info2.classList.add('bg-zinc-200');
         }
       }
     });
