@@ -40,6 +40,11 @@ io.on("connection", (socket) => {
         // Add player to waiting queue
         waitingPlayers.push({ name, socketId: socket.id });
       }
+      // Notify other waiting players if a new player is waiting
+      if (waitingPlayers.length > 0) {
+        const waitingPlayersIds = waitingPlayers.map((player) => player.socketId);
+        io.to(waitingPlayersIds).emit("newPlayerWaiting", { waitingPlayersCount: waitingPlayers.length });
+      }
 
       // Pair players if possible
       if (waitingPlayers.length >= 2) {
@@ -66,12 +71,22 @@ io.on("connection", (socket) => {
   // Handle player moves
   socket.on("boxClicked", (data) => {
     const { id, value } = data;
-
-    // Find the game the player belongs to
-    const game = playerArray.find(
+  const game = playerArray.find(
       (g) => g.player1.socketId === socket.id || (g.player2 && g.player2.socketId === socket.id)
     );
+    if (game.sum === 0) {
+      // Refresh the board and restart the game
+      io.to(game.player1.socketId).emit("refreshBoard");
+      io.to(game.player2.socketId).emit("refreshBoard");
 
+      // Reset the game state
+      game.player1.p1Move = true;
+      game.player2.p2Move = false;
+      game.sum = 0;
+    }
+
+    // Find the game the player belongs to
+  
     if (game) {
       // Check if it's the correct player's turn
       const isPlayer1 = game.player1.socketId === socket.id;
@@ -130,16 +145,22 @@ io.on("connection", (socket) => {
       if (!opponent) {
         waitingPlayers.push({ name: game.player1.socketId === socket.id ? game.player2.name : game.player1.name, socketId: opponentSocketId });
       }
-
-      alert("Game reset by player, opponent notified and disconnected.");
     }
   });
   socket.on("gameOver", (data) => {
-    console.log("Game Over:", data);
-
-    io.emit("winner", { winner: data.winner });
-    
-  }); 
+    let findingPlayer = data.playerName;
+  
+    // Find the game where the player is involved
+    let game = playerArray.find((g) => g.player1.name === findingPlayer || (g.player2 && g.player2.name === findingPlayer));
+  
+    if (game) {
+      // Determine the winner based on the player name
+      let winner = game.player1.name === findingPlayer ? game.player1.name : game.player2.name;
+      
+      // Emit the winner's name to all connected clients
+      io.emit("winner", { winner: winner });
+    }
+  });
 
   // Handle player disconnection
   socket.on("disconnect", () => {

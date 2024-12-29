@@ -1,7 +1,7 @@
 // Create User Entry Modal
 export function createUserEntryModal(socket,Checkfunction) {
   let playerName;
-
+ 
   // Create Modal Elements
   const modal = document.createElement('div');
   modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center mt-10';
@@ -64,9 +64,18 @@ export function createUserEntryModal(socket,Checkfunction) {
     // Show Find Opponent Button
     const findOpponentButton = document.getElementById('findOpponent');
     findOpponentButton.style.display = 'block';
-
+//notification
+// const notification = new Notification('Waiting for players...', {
+//   body: 'Waiting for other players to join...'
+// });
+// socket.on('newPlayerWaiting', (data) => {
+//   const waitingPlayersCount = data.waitingPlayersCount;
+//   notification.body = `Waiting for ${waitingPlayersCount} more players...`;
+//   notification.show();
+// });
     // Handle Game Start
     socket.on('startGame', (e) => {
+  
       console.log('Game started:', e);
       findOpponentButton.style.display = 'none';
 
@@ -95,7 +104,6 @@ export function createUserEntryModal(socket,Checkfunction) {
           const boxText = box.querySelector('.boxtext').textContent;
 
           if (boxText === '' && currentPlayer === playerSymbol) { // Check if it's the player's turn
-            document.querySelector('.boxtext').textContent = playerSymbol; // Local Update (Visual Feedback)
             socket.emit('boxClicked', { id: boxId, value: playerSymbol });
           }
         }
@@ -120,6 +128,8 @@ export function createUserEntryModal(socket,Checkfunction) {
             box.querySelector('.boxtext').textContent = data.value;
             currentPlayer = data.nextPlayer; // Update current player based on server data
 
+            updateGameInfoStyling(currentPlayer); // Update Game Info Styling on both sides
+
             if (data.nextPlayer === playerSymbol) {
               console.log("It's your turn");
               // Enable all boxes for the next move
@@ -136,22 +146,19 @@ export function createUserEntryModal(socket,Checkfunction) {
               });
             }
           }
-          updateGameInfoStyling(data.value);
           let boxes=document.querySelectorAll(".box");
-          let state="looser";
-          if(Checkfunction(boxes)){
-            socket.emit('gameOver',playerName);
-            state = "winner";
+       
+          if (Checkfunction(boxes)) {
             alert("Game Over");
-          }else{
-            console.log(boxes)
+            socket.emit('gameOver', { playerName: playerName });
           }
+          
           socket.on("winner", (data) => {
-            if(data===playerName){
+            if (data.winner === playerName) {
               alert("You won the game");
               document.querySelector(".winnerbox").classList.remove("hidden");
               document.querySelector(".looserbox").classList.add("hidden");
-            }else{
+            } else {
               document.querySelector(".looserbox").classList.remove("hidden");
               document.querySelector(".winnerbox").classList.add("hidden");
             }
@@ -163,16 +170,17 @@ export function createUserEntryModal(socket,Checkfunction) {
       function updateGameInfoStyling(playerSymbol) {
         const info1 = document.querySelector('.info1');
         const info2 = document.querySelector('.info2');
-        if (playerSymbol === 'X') {
-          info1.classList.remove('bg-zinc-600');
-          info1.classList.add('bg-amber-400');
-          info2.classList.remove('bg-zinc-100');
-          info2.classList.add('bg-amber-200');
+        console.log("stylling updated");
+        if (playerSymbol === 'O') {
+          info1.classList.toggle('bg-amber-400');
+          info1.classList.toggle('bg-zinc-600');
+          info2.classList.toggle('bg-amber-400');
+          info2.classList.toggle('bg-zinc-600');
         } else {
-          info1.classList.remove('bg-amber-400');
-          info1.classList.add('bg-zinc-600');
-          info2.classList.remove('bg-amber-200');
-          info2.classList.add('bg-zinc-100');
+          info1.classList.toggle('bg-zinc-600');
+          info1.classList.toggle('bg-amber-400');
+          info2.classList.toggle('bg-zinc-600');
+          info2.classList.toggle('bg-amber-400');
         }
       }
     });

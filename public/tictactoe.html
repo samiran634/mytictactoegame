@@ -115,14 +115,8 @@
       const socket = io();
       createUserEntryModal(socket,isWon);
       document.querySelector("#reset").addEventListener("click", () => {
-        // Clear the board
-        document.querySelectorAll(".box").forEach((box) => box.innerHTML = "");
-
-        // Reset game state variables
-        // This is where you would reset any client-side state variables if needed
-
-        // Notify server to reset game state if necessary
         socket.emit("resetGame");
+        document.querySelectorAll(".box").forEach((box) => box.innerHTML = "");
       });
     </script>
   </body>
