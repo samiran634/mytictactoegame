@@ -85,87 +85,94 @@ export function createUserEntryModal(socket,Checkfunction) {
         document.querySelector('#player-symbol').textContent = playerSymbol.toUpperCase();
         document.querySelector('#opponent-name').textContent = opponent;
         document.querySelector('#opponent-symbol').textContent = playerSymbol === 'X' ? 'O' : 'X';
-        
 
-        // Update Game Info Styling
-      
+        // Initialize current player
+        let currentPlayer = 'X'; // Assuming 'X' starts the game
+
+        // Emit move to server with current player
+        function handleBoxClick(boxId) {
+          const box = document.getElementById(boxId);
+          const boxText = box.querySelector('.boxtext').textContent;
+
+          if (boxText === '' && currentPlayer === playerSymbol) { // Check if it's the player's turn
+            document.querySelector('.boxtext').textContent = playerSymbol; // Local Update (Visual Feedback)
+            socket.emit('boxClicked', { id: boxId, value: playerSymbol });
+          }
+        }
+
+        // Handle Box Clicks
+        document.querySelectorAll('.box').forEach(box => {
+          box.addEventListener('click', () => {
+            const boxText = box.querySelector('.boxtext').textContent;
+            const boxId = box.id;
+
+            if (boxText === '') { // Prevent overwriting moves
+              handleBoxClick(boxId); // Emit move to server with current player
+            }
+          });
+        });
+
+        // Update the board based on server messages and handle player turns appropriately
+        socket.on('updateBoard', (data) => {
+          console.log("this is from updateboard in frontend", data);
+          const box = document.getElementById(data.id);
+          if (box && box.querySelector('.boxtext').textContent === '') { // Update only if box is empty
+            box.querySelector('.boxtext').textContent = data.value;
+            currentPlayer = data.nextPlayer; // Update current player based on server data
+
+            if (data.nextPlayer === playerSymbol) {
+              console.log("It's your turn");
+              // Enable all boxes for the next move
+              document.querySelectorAll('.box').forEach(box => {
+                box.classList.remove('opacity-50', 'cursor-not-allowed'); // Remove disabled classes
+                box.disabled = false; // Enable the box
+              });
+            } else {
+              console.log("Waiting for opponent's move");
+              // Disable all boxes until the next move
+              document.querySelectorAll('.box').forEach(box => {
+                box.classList.add('opacity-50', 'cursor-not-allowed'); // Add disabled classes
+                box.disabled = true; // Disable the box
+              });
+            }
+          }
+          updateGameInfoStyling(playerSymbol);
+          let boxes=document.querySelectorAll(".box");
+          if(Checkfunction(boxes)){
+            socket.emit('gameOver',playerName);
+            alert("Game Over");
+          }else{
+            console.log(boxes)
+          }
+          socket.on("winner", (data) => {
+            if(data===playerName){
+              alert("You won the game");
+              document.querySelector(".winnerbox").classList.remove("hidden");
+              document.querySelector(".looserbox").classList.add("hidden");
+            }else{
+              document.querySelector(".looserbox").classList.remove("hidden");
+              document.querySelector(".winnerbox").classList.add("hidden");
+            }
+          });
+        });
       }
 
-      const playerSymbol = document.querySelector('#player-symbol').textContent;
-// Handle Box Clicks
-document.querySelectorAll('.box').forEach(box => {
-  box.addEventListener('click', () => {
-    let  move=game.player1.name===playerName?game.player1.p1Move:game.player2.p2Move;
-    const boxText = box.querySelector('.boxtext').textContent;
-    const boxId = box.id;
-
-    if (boxText === '') { // Prevent overwriting moves
-      // Get player's symbol
-      box.querySelector('.boxtext').textContent = playerSymbol; // Local Update (Visual Feedback)
-      move=move===true?false:true;
- 
-      // Emit event to server
-      socket.emit('boxClicked', { id: boxId, value: playerSymbol,nxtMove: move });
-    
-    }
-  
-  });
-});
-updateBoard(  )
-
-// Listen for updates from the server
-function updateBoard(   ){
-  socket.on('updateBoard', (data) => {
-    console.log("this is from updateboard in frontend",data);
-    const box = document.getElementById(data.id);
-    if (box && box.querySelector('.boxtext').textContent === '') { // Update only if box is empty
-      box.querySelector('.boxtext').textContent = data.value;
-      if (data.nxtMove === true) {
-        console.log(data.value);
-        // Enable all boxes for the next move
-        document.querySelectorAll('.box').forEach(box => {
-          box.classList.remove('opacity-50', 'cursor-not-allowed'); // Remove disabled classes
-          box.disabled = false; // Enable the box
-          console.log("boxes enabled")
-        });
-      } else {
-        // Disable all boxes for the next move
-        document.querySelectorAll('.box').forEach(box => {
-          box.classList.add('opacity-50', 'cursor-not-allowed'); // Add disabled classes
-          box.disabled = true; // Disable the box
-          console.log("boxes desabled")
-        });
+      // Helper: Update Game Info Styling
+      function updateGameInfoStyling(playerSymbol) {
+        const info1 = document.querySelector('.info1');
+        const info2 = document.querySelector('.info2');
+        if (playerSymbol === 'X') {
+          info1.classList.remove('bg-zinc-600');
+          info1.classList.add('bg-amber-400');
+          info2.classList.remove('bg-amber-200');
+          info2.classList.add('bg-zinc-100');
+        } else {
+          info1.classList.remove('bg-zinc-400');
+          info1.classList.add('bg-amber-600');
+          info2.classList.remove('bg-amber-100');
+          info2.classList.add('bg-zinc-200');
+        }
       }
-    }
-    updateGameInfoStyling(playerSymbol);
-    let boxes=document.querySelectorAll(".box");
-    if(Checkfunction(boxes)){
-  
-      alert("Game Over");
-    }else{
-      console.log(boxes)
-    }
-  });
-}
-
-});
-  
-  }
-
-  // Helper: Update Game Info Styling
-  function updateGameInfoStyling(playerSymbol) {
-    const info1 = document.querySelector('.info1');
-    const info2 = document.querySelector('.info2');
-    if (playerSymbol === 'X') {
-      info1.classList.remove('bg-zinc-600');
-      info1.classList.add('bg-amber-400');
-      info2.classList.remove('bg-amber-200');
-      info2.classList.add('bg-zinc-100');
-    } else {
-      info1.classList.remove('bg-zinc-400');
-      info1.classList.add('bg-amber-600');
-      info2.classList.remove('bg-amber-100');
-      info2.classList.add('bg-zinc-200');
-    }
+    });
   }
 }

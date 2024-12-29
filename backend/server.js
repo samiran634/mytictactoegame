@@ -65,34 +65,81 @@ io.on("connection", (socket) => {
 
   // Handle player moves
   socket.on("boxClicked", (data) => {
-    const { id, value,nxtMove} = data;
+    const { id, value } = data;
 
     // Find the game the player belongs to
     const game = playerArray.find(
       (g) => g.player1.socketId === socket.id || (g.player2 && g.player2.socketId === socket.id)
     );
-  
+
     if (game) {
-      // Update the server-side game state
-      if (game.player1.pvalue === value) {
-        game.player1.p1Move = nxtMove;
-      } else if (game.player2 && game.player2.pvalue === value) {
-        game.player2.p2Move = nxtMove;
+      // Check if it's the correct player's turn
+      const isPlayer1 = game.player1.socketId === socket.id;
+      const isPlayer2 = game.player2 && game.player2.socketId === socket.id;
+
+      if ((isPlayer1 && game.player1.p1Move) || (isPlayer2 && game.player2.p2Move)) {
+        // Update the server-side game state
+        if (isPlayer1) {
+          game.player1.p1Move = false;
+          game.player2.p2Move = true;
+          console.log(`Player X (${game.player1.name}) made a move.`);
+        } else if (isPlayer2) {
+          game.player2.p2Move = false;
+          game.player1.p1Move = true;
+          console.log(`Player O (${game.player2.name}) made a move.`);
+        }
+
+        game.sum += 1;
+
+        // Determine the next player
+        const nextPlayer = isPlayer1 ? game.player2.pvalue : game.player1.pvalue;
+
+        // Broadcast the move to both players in the game
+        io.to(game.player1.socketId).emit("updateBoard", { id, value, nextPlayer });
+        if (game.player2) {
+          io.to(game.player2.socketId).emit("updateBoard", { id, value, nextPlayer });
+        }
+
+        console.log(`Move updated: Player ${nextPlayer}, Box ${id}`);
+      } else {
+        console.log("Not this player's turn.");
       }
-
-      game.sum += 1;
-
-      // Broadcast the move to both players in the game
-      io.to(game.player1.socketId).emit("updateBoard", { id, value,nxtMove });
-      if (game.player2) {
-        io.to(game.player2.socketId).emit("updateBoard", { id, value,nxtMove });
-      }
-
-      console.log(`Move updated: Player ${value}, Box ${id}`);
     } else {
-      alert("Game not found for the current player.Please reload");
+      console.log("Game not found for the current player. Please reload.");
     }
   });
+
+  // Handle game reset
+  socket.on("resetGame", () => {
+    // Find the game the player belongs to
+    const game = playerArray.find(
+      (g) => g.player1.socketId === socket.id || (g.player2 && g.player2.socketId === socket.id)
+    );
+
+    if (game) {
+      const opponentSocketId = game.player1.socketId === socket.id ? game.player2.socketId : game.player1.socketId;
+
+      // Notify the opponent that the game has been restarted
+      io.to(opponentSocketId).emit("opponentRestarted");
+
+      // Remove both players from the game
+      playerArray = playerArray.filter((g) => g !== game);
+
+      // Add the opponent back to the waiting queue
+      const opponent = waitingPlayers.find((player) => player.socketId === opponentSocketId);
+      if (!opponent) {
+        waitingPlayers.push({ name: game.player1.socketId === socket.id ? game.player2.name : game.player1.name, socketId: opponentSocketId });
+      }
+
+      alert("Game reset by player, opponent notified and disconnected.");
+    }
+  });
+  socket.on("gameOver", (data) => {
+    console.log("Game Over:", data);
+
+    io.emit("winner", { winner: data.winner });
+    
+  }); 
 
   // Handle player disconnection
   socket.on("disconnect", () => {
