@@ -13,7 +13,7 @@ app.use(express.static(path.resolve("./public")));
 
 // Routes
 app.get("/", (req, res) => {
-  res.sendFile(path.resolve("./public/tictactoe.html"));
+  res.sendFile(path.resolve("./public/index.html"));
 });
 
 // Game state management
