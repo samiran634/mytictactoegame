@@ -29,20 +29,12 @@ export function createUserEntryModal(socket,Checkfunction) {
   modal.appendChild(modalContent);
   document.body.appendChild(modal);
 
-  // Check for existing playerName in localStorage
-  const storedPlayerName = localStorage.getItem('playerName');
-  if (storedPlayerName) {
-    playerName = storedPlayerName;
-    console.log('Reconnecting as:', playerName);
-    modal.remove();
-    startPlayerSession(playerName);
-  }
+ 
 
   // Handle Button Click
   button.addEventListener('click', () => {
     playerName = input.value.trim();
     if (playerName) {
-      localStorage.setItem('playerName', playerName);
       modal.remove();
       startPlayerSession(playerName);
     } else {
@@ -122,19 +114,17 @@ export function createUserEntryModal(socket,Checkfunction) {
 
         // Update the board based on server messages and handle player turns appropriately
         socket.on('updateBoard', (data) => {
-          console.log("this is from updateboard in frontend", data);
           const box = document.getElementById(data.id);
-          if (box && box.querySelector('.boxtext').textContent === '') { // Update only if box is empty
+          if (box && box.querySelector('.boxtext').textContent === '') {  
             box.querySelector('.boxtext').textContent = data.value;
-            currentPlayer = data.nextPlayer; // Update current player based on server data
+            currentPlayer = data.nextPlayer;  
 
-            updateGameInfoStyling(currentPlayer); // Update Game Info Styling on both sides
+            updateGameInfoStyling(currentPlayer);  
 
             if (data.nextPlayer === playerSymbol) {
-              console.log("It's your turn");
-              // Enable all boxes for the next move
+  
               document.querySelectorAll('.box').forEach(box => {
-                box.classList.remove('opacity-50', 'cursor-not-allowed'); // Remove disabled classes
+                box.classList.remove('opacity-50', 'cursor-not-allowed'); 
                 box.disabled = false; // Enable the box
               });
             } else {
@@ -149,22 +139,32 @@ export function createUserEntryModal(socket,Checkfunction) {
           let boxes=document.querySelectorAll(".box");
        
           if (Checkfunction(boxes)) {
-            alert("Game Over");
-            socket.emit('gameOver', { playerName: playerName });
+            // Disable all boxes for further input
+            document.querySelectorAll('.box').forEach(box => {
+              box.disabled = true;
+              box.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            
+            socket.emit('gameOver', { playerName: playerName,playerSymbol:playerSymbol });
           }
-          
-          socket.on("winner", (data) => {
-            if (data.winner === playerName) {
-              alert("You won the game");
-              document.querySelector(".winnerbox").classList.remove("hidden");
-              document.querySelector(".looserbox").classList.add("hidden");
-            } else {
-              document.querySelector(".looserbox").classList.remove("hidden");
-              document.querySelector(".winnerbox").classList.add("hidden");
-            }
-          });
         });
+        socket.on("winner", (data) => {
+          console.log(data);
+          if (data.winner === playerName) {
+            alert("you won!")
+            document.querySelector(".winnerbox").setAttribute('style',"display:flex");
+            document.querySelector(".looserbox").setAttribute('style','display:hidden');
+  
+          } else if(data.winner!==playerName) {
+            alert("you loose!")
+            document.querySelector(".looserbox").setAttribute('style',"display:flex");
+            document.querySelector(".winnerbox").setAttribute('style',"display:hidden");
+      
+          }
+        });
+
       }
+
 
       // Helper: Update Game Info Styling
       function updateGameInfoStyling(playerSymbol) {

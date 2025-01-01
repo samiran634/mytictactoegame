@@ -24,7 +24,7 @@ export function isWon() {
     const box2 = box2Element.querySelector('.boxtext')?.textContent || '';
     const box3 = box3Element.querySelector('.boxtext')?.textContent || '';
 
-    console.log(`Checking: ${arr[i][0]}=${box1}, ${arr[i][1]}=${box2}, ${arr[i][2]}=${box3}`);
+    // console.log(`Checking: ${arr[i][0]}=${box1}, ${arr[i][1]}=${box2}, ${arr[i][2]}=${box3}`);
 
     if (box1 !== '' && box1 === box2 && box2 === box3) {
       console.log('Winning condition met');

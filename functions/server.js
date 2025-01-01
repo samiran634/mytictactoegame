@@ -1,4 +1,6 @@
 const express = require("express");
+const serverless = require('serverless-http');
+const router=express.Router();
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const path = require("path");
@@ -9,27 +11,25 @@ const io = new Server(server);
 
 // Middleware for parsing and serving static files
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.resolve("./public")));
-
-// Routes
+app.use(express.static(path.join(__dirname, "../dist")));
 app.get("/", (req, res) => {
-  res.sendFile(path.resolve("./public/index.html"));
+  res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
 
 // Game state management
-let waitingPlayers = []; // Waiting players queue
-let playerArray = [];    // Active games
+let waitingPlayers = [];  
+let playerArray = [];     
 
 // Socket.IO handling
 io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+ 
 
   // Player joining logic
   socket.on("playerJoined", (data) => {
     const { name } = data;
 
     if (name) {
-      console.log("Player joined:", name);
+  
 
       // Check if player is reconnecting
       const existingPlayer = waitingPlayers.find((player) => player.name === name);
@@ -149,16 +149,19 @@ io.on("connection", (socket) => {
   });
   socket.on("gameOver", (data) => {
     let findingPlayer = data.playerName;
-  
+  let symbol=data.playerSymbol;
     // Find the game where the player is involved
     let game = playerArray.find((g) => g.player1.name === findingPlayer || (g.player2 && g.player2.name === findingPlayer));
   
     if (game) {
-      // Determine the winner based on the player name
-      let winner = game.player1.name === findingPlayer ? game.player1.name : game.player2.name;
-      
-      // Emit the winner's name to all connected clients
-      io.emit("winner", { winner: winner });
+      // Determine the winner based on the player symbol
+      let winner = game.player1.pvalue === symbol ? game.player1.name : game.player2.name;
+      console.log(winner);
+      // Emit the winner's name to both players in the game
+      io.to(game.player1.socketId).emit("winner", { winner: winner });
+      if (game.player2) {
+        io.to(game.player2.socketId).emit("winner", { winner: winner });
+      }
     }
   });
 
@@ -190,7 +193,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// Start the server
-server.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
-});
+ 
+app.use('/.netlify/functions/api', router);
+module.exports.handler = serverless(app);
