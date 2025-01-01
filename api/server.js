@@ -1,6 +1,4 @@
 const express = require("express");
-const serverless = require('serverless-http');
-const router=express.Router();
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const path = require("path");
@@ -194,5 +192,9 @@ io.on("connection", (socket) => {
 });
 
  
-app.use('/.netlify/functions/api', router);
-module.exports.handler = serverless(app);
+server.listen(3000, () => {
+  console.log("Server is listening on port 3000");
+});
+
+// Export the server for Vercel
+module.exports = server;
