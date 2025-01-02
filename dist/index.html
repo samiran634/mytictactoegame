@@ -96,7 +96,23 @@
         <button id="reset" class="bg-amber-400 text-stone-500 text-lg px-4 py-2 rounded mt-4 md:mt-0">Reset</button>
       </div>
       <div class="winnerbox mt-4 hidden">
-        <img src="./excited.gif" alt="" class="w-32 h-32 mx-auto" />
+        <img src="./excited.gif" alt="" class="w-32 h-32 mx-auto winner-gif" />
+        <style>
+          .winner-gif {
+            animation: winnerGif 1s ease-in-out;
+          }
+          @keyframes winnerGif {
+            0% {
+              transform: scale(1) translateY(0);
+            }
+            50% {
+              transform: scale(1.2) translateY(-10px);
+            }
+            100% {
+              transform: scale(1) translateY(0);
+            }
+          }
+        </style>
       </div>
       <div class="looserbox mt-4 hidden">
         you loose <strong>play again</strong>

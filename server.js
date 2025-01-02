@@ -9,11 +9,14 @@ const io = new Server(server);
 
 // Middleware for parsing and serving static files
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "../dist")));
+app.use(express.static(path.join(__dirname, "dist")));
+
+// Root Route
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../dist/index.html"));
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
+let cheakforwinner=0;
 // Game state management
 let waitingPlayers = [];  
 let playerArray = [];     
@@ -151,7 +154,7 @@ io.on("connection", (socket) => {
     // Find the game where the player is involved
     let game = playerArray.find((g) => g.player1.name === findingPlayer || (g.player2 && g.player2.name === findingPlayer));
   
-    if (game) {
+    if (game&&cheakforwinner===0) {
       // Determine the winner based on the player symbol
       let winner = game.player1.pvalue === symbol ? game.player1.name : game.player2.name;
       console.log(winner);
@@ -160,6 +163,7 @@ io.on("connection", (socket) => {
       if (game.player2) {
         io.to(game.player2.socketId).emit("winner", { winner: winner });
       }
+      cheakforwinner=1;
     }
   });
 
@@ -191,9 +195,9 @@ io.on("connection", (socket) => {
   });
 });
 
- 
-server.listen(3000, () => {
-  console.log("Server is listening on port 3000");
+let PORT=3000||process.env.PORT;
+server.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
 });
 
 // Export the server for Vercel
