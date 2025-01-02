@@ -7,6 +7,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+const PORT=process.env.PORT||4000;
 // Middleware for parsing and serving static files
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "dist")));
@@ -195,7 +196,6 @@ io.on("connection", (socket) => {
   });
 });
 
-let PORT=3000||process.env.PORT;
 server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
